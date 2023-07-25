@@ -15,6 +15,7 @@ Para visualizar o projeto navegue pelas branchs que representam cada etapa do de
 - [Etapa 6 - Removendo e atualizando tasks](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa6-removendo-atualizando-task)
 - [Etapa 7 - Configurando o build](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa7-build)
 - [Etapa 8 - Deploy](https://github.com/felipez3r0/workshop-node-ts-intro#etapa-8---deploy)
+- [Etapa 9 - CORS](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa9-cors)
 
 ## Passo a passo
 
@@ -392,4 +393,25 @@ Para o deploy vamos utilizar o Render, depois de criar a conta utilizando o Gith
 Vamos ajustar alguns pontos da configuração para garantir o build da aplicação
 ![image](https://github.com/felipez3r0/workshop-node-ts-intro/assets/7429615/611fefa4-61dd-4ca9-8c5e-db102d41c002)
 
+### Etapa 9 - CORS
+
+Vamos adicionar o CORS para permitir que nossa API seja acessada por outros domínios
+```shell
+yarn add cors @types/cors
+```
+
+Ajustamos o arquivo src/server.ts para utilizar o CORS
+```typescript
+import cors from 'cors'
+app.use(cors()) // habilita o CORS
+```
+
+Isso vai permitir que nossa API seja acessada por qualquer domínio, mas também podemos configurar para permitir apenas alguns domínios
+```typescript
+app.use(cors({
+  origin: ['http://localhost:3000', 'https://meuapp.com']
+}))
+```
+
+Outra forma de ajustar o CORS seria utilizando o proxy reverso do Nginx ou algo nessa linha, mas isso fica para outro workshop :)
 
