@@ -389,4 +389,7 @@ join(__dirname, '..', 'models/*.{ts,js}')
 Para o deploy vamos utilizar o Render, depois de criar a conta utilizando o Github vamos selecionar a opção Web Services
 ![image](https://github.com/felipez3r0/workshop-node-ts-intro/assets/7429615/d4da0a76-00f0-40e4-bfe2-44accd341794)
 
+Vamos ajustar alguns pontos da configuração para garantir o build da aplicação
+![image](https://github.com/felipez3r0/workshop-node-ts-intro/assets/7429615/611fefa4-61dd-4ca9-8c5e-db102d41c002)
+
 
