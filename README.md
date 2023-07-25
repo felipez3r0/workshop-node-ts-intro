@@ -12,6 +12,7 @@ Para visualizar o projeto navegue pelas branchs que representam cada etapa do de
 - [Etapa 3 - Configuração do BD](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa3-configuracao-bd)
 - [Etapa 4 - Criando uma task](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa4-criando-task)
 - [Etapa 5 - Listando tasks](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa5-listando-tasks)
+- [Etapa 6 - Removendo e atualizando tasks](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa6-removendo-atualizando-task)
 
 ## Passo a passo
 
@@ -283,5 +284,59 @@ E o método show no controller src/controllers/task/task.controller.ts
 
     const task = await Task.findOneBy({id: Number(id)})
     return res.json(task)
+  }
+```
+
+### Etapa 6 - Removendo e atualizando tasks
+
+Vamos criar uma rota para remover uma task no arquivo src/routes/task/task.routes.ts
+```typescript
+taskRoutes.delete('/:id', TaskController.delete)
+```
+
+E o método delete no controller src/controllers/task/task.controller.ts
+```typescript
+  static async delete (req: Request, res: Response) {
+    const { id } = req.params
+
+    if(!id || isNaN(Number(id))) {
+      return res.status(400).json({ error: 'O id é obrigatório' })
+    }
+
+    const task = await Task.findOneBy({id: Number(id)})
+    if (!task) {
+      return res.status(404).json({ error: 'Task não encontrada' })
+    }
+
+    await task.remove()
+    return res.status(204).json() // Vamos retornar 204 pois não temos conteúdo para retornar
+  }
+```
+
+Vamos criar uma rota para atualizar uma task no arquivo src/routes/task/task.routes.ts
+```typescript
+taskRoutes.put('/:id', TaskController.update) // usamos o put para atualizar todos os campos
+```
+
+E o método update no controller src/controllers/task/task.controller.ts
+```typescript
+  static async update (req: Request, res: Response) {
+    const { id } = req.params
+    const { title, completed } = req.body
+
+    if(!id || isNaN(Number(id))) {
+      return res.status(400).json({ error: 'O id é obrigatório' })
+    }
+
+    const task = await Task.findOneBy({id: Number(id)})
+    if (!task) {
+      return res.status(404).json({ error: 'Task não encontrada' })
+    }
+
+    task.title = title || task.title
+    task.completed = completed || task.completed
+    await task.save()
+
+    return res.json(task) // Vamos retornar a task atualizada
   }
 ```
