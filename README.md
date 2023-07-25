@@ -54,3 +54,35 @@ Executamos o projeto para testar
 ```shell
 yarn dev
 ```
+
+### Etapa 2 - Preparação do Express
+
+Criamos o arquivo .env na raiz do projeto e adicionamos a porta que será utilizada
+```env
+PORT=3000
+```
+
+Adicionamos o arquivo .env ao .gitignore
+```gitignore
+node_modules
+.env
+```
+
+Ajustamos o arquivo server.ts para utilizar o express e a porta definida no .env
+```typescript
+import express from 'express'
+import dotenv from 'dotenv'
+
+dotenv.config()
+const app = express()
+const port = process.env.PORT || 3001
+
+app.listen(port, () => {
+  console.log(`Servidor executando na porta ${port}`)
+})
+```
+
+Agora conseguimos executar o projeto e visualizar a mensagem no console (também podemos testar no navegador)
+```shell
+yarn dev
+```
