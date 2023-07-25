@@ -10,6 +10,7 @@ Para visualizar o projeto navegue pelas branchs que representam cada etapa do de
 - [Etapa 1 - Configuração do projeto](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa1-configuracao)
 - [Etapa 2 - Preparação do Express](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa2-preparacao-express)
 - [Etapa 3 - Configuração do BD](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa3-configuracao-bd)
+- [Etapa 4 - Criando uma task](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa4-criando-task)
 
 ## Passo a passo
 
@@ -156,6 +157,93 @@ import dataBase from './database/ormconfig'
 dotenv.config()
 const app = express()
 const port = process.env.PORT || 3001
+
+app.listen(port, () => {
+  console.log(`Servidor executando na porta ${port}`)
+  console.log(`Banco de dados`, dataBase.isInitialized ? 'inicializado' : 'não inicializado')
+})
+```
+
+### Etapa 4 - Criando uma task
+
+Vamos organizar melhor uma estrutura de pastas para separar as responsabilidades da aplicação - como estamos tendando criar uma API bem simples aqui vamos adotar apenas um modelo de Model/Controller - nosso Controller vai buscar os dados no Model e retornar para o client
+```
+src
+├── controllers
+│   └── task
+│       └── task.controller.ts
+├── database
+│   └── ormconfig.ts
+├── models
+│   └── task.entity.ts
+├── routes
+│   └── task
+│       └── task.routes.ts
+│   └── index.ts
+└── server.ts
+```
+
+Criamos o arquivo src/routes/index.ts
+```typescript
+import { Router } from 'express'
+import taskRoutes from './task/task.routes'
+
+const routes = Router()
+
+routes.use('/task', taskRoutes)
+
+export default routes
+```
+
+Criamos o arquivo src/routes/task/task.routes.ts
+```typescript
+import { Router } from 'express'
+import TaskController from '../../controllers/task/task.controller'
+
+const taskRoutes = Router()
+
+taskRoutes.post('/', TaskController.store)
+
+export default taskRoutes
+```
+
+Criamos o arquivo src/controllers/task/task.controller.ts
+```typescript
+import { Request, Response } from 'express'
+import Task from '../../models/task.entity'
+
+export default class TaskController {
+  static async store (req: Request, res: Response) {
+    const { title, completed } = req.body
+
+    if (!title) {
+      return res.status(400).json({ error: 'O título é obrigatório' })
+    }
+
+    const task = new Task()
+    task.title = title
+    task.completed = completed || false
+    await task.save()
+
+    return res.status(201).json(task)
+  }
+}
+```
+
+Ajustamos o arquivo src/server.ts para utilizar as rotas
+```typescript
+import express from 'express'
+import dotenv from 'dotenv'
+import dataBase from './database/ormconfig'
+
+import routes from './routes'
+
+dotenv.config()
+const app = express()
+const port = process.env.PORT || 3001
+
+app.use(express.json()) // habilita o express para receber dados no formato json
+app.use(routes) // habilita as rotas
 
 app.listen(port, () => {
   console.log(`Servidor executando na porta ${port}`)
