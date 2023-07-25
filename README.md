@@ -11,6 +11,7 @@ Para visualizar o projeto navegue pelas branchs que representam cada etapa do de
 - [Etapa 2 - Preparação do Express](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa2-preparacao-express)
 - [Etapa 3 - Configuração do BD](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa3-configuracao-bd)
 - [Etapa 4 - Criando uma task](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa4-criando-task)
+- [Etapa 5 - Listando tasks](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa5-listando-tasks)
 
 ## Passo a passo
 
