@@ -250,3 +250,37 @@ app.listen(port, () => {
   console.log(`Banco de dados`, dataBase.isInitialized ? 'inicializado' : 'não inicializado')
 })
 ```
+
+### Etapa 5 - Listando as tasks
+
+Vamos criar uma rota para listar as tasks no arquivo src/routes/task/task.routes.ts
+```typescript
+taskRoutes.get('/', TaskController.index)
+```
+
+E o método index no controller src/controllers/task/task.controller.ts
+```typescript
+static async index (req: Request, res: Response) {
+  const tasks = await Task.find()
+  return res.json(tasks)
+}
+```
+
+Vamos criar uma rota para buscar uma task no arquivo src/routes/task/task.routes.ts
+```typescript
+taskRoutes.get('/:id', TaskController.show)
+```
+
+E o método show no controller src/controllers/task/task.controller.ts
+```typescript
+  static async show (req: Request, res: Response) {
+    const { id } = req.params
+
+    if(!id || isNaN(Number(id))) {
+      return res.status(400).json({ error: 'O id é obrigatório' })
+    }
+
+    const task = await Task.findOneBy({id: Number(id)})
+    return res.json(task)
+  }
+```
