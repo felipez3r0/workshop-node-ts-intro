@@ -101,7 +101,7 @@ Criamos uma pasta src/database e o arquivo ormconfig.ts
 import { DataSource } from 'typeorm'
 import dotenv from 'dotenv'
 
-dotenv.config()
+dotenv.config() // carrega as variáveis de ambiente do arquivo .env
 
 const dataBase = new DataSource({
   type: 'sqlite',
@@ -109,8 +109,8 @@ const dataBase = new DataSource({
   entities: [
     './src/models/*.ts'
   ],
-  logging: true,
-  synchronize: true
+  logging: true, // log das queries executadas
+  synchronize: true // cria as tabelas automaticamente
 })
 
 dataBase.initialize()
