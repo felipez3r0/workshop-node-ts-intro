@@ -1,0 +1,23 @@
+{
+  "name": "workshop-node-ts-intro",
+  "version": "1.0.0",
+  "description": "api rest",
+  "main": "index.js",
+  "repository": "https://github.com/felipez3r0/workshop-node-ts-intro.git",
+  "author": "Felipe do E. Santo <felipez3r0@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  },
+  "scripts": {
+    "dev": "nodemon --exec ts-node-dev src/server.ts"
+  },  
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.4.4",
+    "nodemon": "^3.0.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.1.6"
+  }
+}
