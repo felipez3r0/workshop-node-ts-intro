@@ -13,6 +13,7 @@ Para visualizar o projeto navegue pelas branchs que representam cada etapa do de
 - [Etapa 4 - Criando uma task](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa4-criando-task)
 - [Etapa 5 - Listando tasks](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa5-listando-tasks)
 - [Etapa 6 - Removendo e atualizando tasks](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa6-removendo-atualizando-task)
+- [Etapa 7 - Configurando o build](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa7-build)
 
 ## Passo a passo
 
@@ -339,4 +340,27 @@ E o método update no controller src/controllers/task/task.controller.ts
 
     return res.json(task) // Vamos retornar a task atualizada
   }
+```
+
+### Etapa 7 - Configurando o build
+
+Ajustamos o tsconfig.json para gerar o build
+```json
+"outDir": "./dist",
+"rootDir": "./src",
+```
+
+Adicionamos a pasta dist no .gitignore
+```gitignore
+node_modules
+.env
+dist
+```
+
+Ajustamos o package.json para fazer o build
+```json
+"scripts": {
+    "dev": "nodemon --exec ts-node-dev src/server.ts",
+    "build": "tsc"
+  },
 ```
