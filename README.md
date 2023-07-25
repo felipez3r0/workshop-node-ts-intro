@@ -15,6 +15,7 @@ Para visualizar o projeto navegue pelas branchs que representam cada etapa do de
 - [Etapa 6 - Removendo e atualizando tasks](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa6-removendo-atualizando-task)
 - [Etapa 7 - Configurando o build](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa7-build)
 - [Etapa 8 - Deploy](https://github.com/felipez3r0/workshop-node-ts-intro#etapa-8---deploy)
+- [Etapa 9 - CORS](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa9-cors)
 
 ## Passo a passo
 
