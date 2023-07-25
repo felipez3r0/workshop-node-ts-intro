@@ -14,6 +14,7 @@ Para visualizar o projeto navegue pelas branchs que representam cada etapa do de
 - [Etapa 5 - Listando tasks](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa5-listando-tasks)
 - [Etapa 6 - Removendo e atualizando tasks](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa6-removendo-atualizando-task)
 - [Etapa 7 - Configurando o build](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa7-build)
+- [Etapa 8 - Deploy](https://github.com/felipez3r0/workshop-node-ts-intro#etapa-8---deploy)
 
 ## Passo a passo
 
@@ -364,3 +365,28 @@ Ajustamos o package.json para fazer o build
     "build": "tsc"
   },
 ```
+
+### Etapa 8 - Deploy
+
+Antes do deploy vamos fazer um pequeno ajuste para o build, no arquivo ormconfig.js
+```typescript
+const dataBase = new DataSource({
+  type: 'sqlite',
+  database: process.env.DATABASE || './src/database/database.sqlite',
+  entities: [
+    join(__dirname, '..', 'models/*.{ts,js}')
+  ],
+  logging: true,
+  synchronize: true
+})
+```
+
+A alteração foi para corrigir o caminho das entidades ao realizar o build
+```typescript
+join(__dirname, '..', 'models/*.{ts,js}')
+```
+
+Para o deploy vamos utilizar o Render, depois de criar a conta utilizando o Github vamos selecionar a opção Web Services
+![image](https://github.com/felipez3r0/workshop-node-ts-intro/assets/7429615/d4da0a76-00f0-40e4-bfe2-44accd341794)
+
+
