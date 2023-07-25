@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm'
 import dotenv from 'dotenv'
+import { join } from 'path'
 
 dotenv.config()
 
@@ -7,7 +8,7 @@ const dataBase = new DataSource({
   type: 'sqlite',
   database: process.env.DATABASE || './src/database/database.sqlite',
   entities: [
-    './src/models/*.ts'
+    join(__dirname, '..', 'models/*.{ts,js}')
   ],
   logging: true,
   synchronize: true
