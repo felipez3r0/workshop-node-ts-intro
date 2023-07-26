@@ -62,8 +62,9 @@ export default class TaskController {
       return res.status(404).json({ error: 'Task não encontrada' })
     }
 
-    task.title = title || task.title
-    task.completed = completed || task.completed
+    task.title = title
+    task.completed = completed
+    
     await task.save()
 
     return res.json(task)
