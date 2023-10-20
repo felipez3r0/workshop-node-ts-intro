@@ -337,7 +337,7 @@ E o método update no controller src/controllers/task/task.controller.ts
     }
 
     task.title = title || task.title
-    task.completed = completed || task.completed
+    task.completed = (completed === undefined) ? task.completed : completed
     await task.save()
 
     return res.json(task) // Vamos retornar a task atualizada
