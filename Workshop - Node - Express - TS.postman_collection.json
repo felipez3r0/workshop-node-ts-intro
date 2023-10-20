@@ -66,6 +66,51 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Delete task",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{HOST}}/task/1",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"task",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update task",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"Tarefa editada 2\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{HOST}}/task/2",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"task",
+						"2"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [
