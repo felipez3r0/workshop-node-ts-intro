@@ -53,6 +53,8 @@ export default class TaskController {
     const { id } = req.params
     const { title, completed } = req.body
 
+    console.log(title, completed)
+
     if(!id || isNaN(Number(id))) {
       return res.status(400).json({ error: 'O id é obrigatório' })
     }
@@ -63,7 +65,7 @@ export default class TaskController {
     }
 
     task.title = title || task.title
-    task.completed = completed || task.completed
+    task.completed = (completed === undefined) ? task.completed : completed
     await task.save()
 
     return res.json(task)
