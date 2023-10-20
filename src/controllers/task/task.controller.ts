@@ -53,8 +53,6 @@ export default class TaskController {
     const { id } = req.params
     const { title, completed } = req.body
 
-    console.log(title, completed)
-
     if(!id || isNaN(Number(id))) {
       return res.status(400).json({ error: 'O id é obrigatório' })
     }
