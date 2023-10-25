@@ -9,6 +9,21 @@
 		{
 			"name": "Add task",
 			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "COOg12EKKPMvzncffX.i",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "authorization",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -40,7 +55,7 @@
 					"apikey": [
 						{
 							"key": "value",
-							"value": "6HkJPLTxXY8bz5g9s4xy",
+							"value": "COOg12EKKPMvzncffX.i",
 							"type": "string"
 						},
 						{
@@ -67,6 +82,21 @@
 		{
 			"name": "Get task by Id",
 			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "COOg12EKKPMvzncffX.i",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "authorization",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -85,6 +115,21 @@
 		{
 			"name": "Delete task",
 			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "COOg12EKKPMvzncffX.i",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "authorization",
+							"type": "string"
+						}
+					]
+				},
 				"method": "DELETE",
 				"header": [],
 				"url": {
@@ -103,6 +148,21 @@
 		{
 			"name": "Update task",
 			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "COOg12EKKPMvzncffX.i",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "authorization",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
 				"body": {
@@ -115,13 +175,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{HOST}}/task/2",
+					"raw": "{{HOST}}/task/1",
 					"host": [
 						"{{HOST}}"
 					],
 					"path": [
 						"task",
-						"2"
+						"1"
 					]
 				}
 			},
