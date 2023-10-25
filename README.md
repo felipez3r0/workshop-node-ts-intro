@@ -415,3 +415,234 @@ app.use(cors({
 
 Outra forma de ajustar o CORS seria utilizando o proxy reverso do Nginx ou algo nessa linha, mas isso fica para outro workshop :)
 
+### Etapa 10 - Criando uma autenticação básica
+
+Podemos realizar o processo de autenticação de diversas formas, aqui vamos construir uma autenticação simples utilizando um Token e um Refresh Token
+Vamos começar criando a entidade User - user.entity.ts
+```typescript
+import { Entity, BaseEntity, PrimaryGeneratedColumn, Column } from 'typeorm'
+
+@Entity()
+export default class User extends BaseEntity {
+  @PrimaryGeneratedColumn()
+  id!: number
+
+  @Column()
+  name!: string
+
+  @Column()
+  email!: string
+
+  @Column()
+  password!: string
+}
+```
+
+Vamos ter também uma entidade para controlar os tokens de acesso - token.entity.ts
+```typescript
+import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm'
+import User from './user.entity'
+
+@Entity()
+export default class Token extends BaseEntity {
+  @PrimaryGeneratedColumn()
+  id!: number
+
+  @Column()
+  token!: string
+
+  @Column()
+  refreshToken!: string
+
+  @Column()
+  expiresAt!: Date  
+
+  @Column()
+  userId!: number
+
+  @ManyToOne(() => User, user => user.tokens)
+  user!: User
+}
+```
+
+Vamos adicionar a relação entre as entidades no arquivo user.entity.ts
+```typescript
+@OneToMany(() => Token, token => token.user)
+tokens!: Token[]
+```
+
+Para gerar os hashs vamos utilizar o bcrypt - vamos adicionar ao projeto
+```shell
+yarn add bcrypt @types/bcrypt
+```
+
+Agora vamos criar o controller para as funções de autenticação - auth.controller.ts
+```typescript
+import { Request, Response } from 'express'
+import User from '../../models/user.entity'
+import Token from '../../models/token.entity'
+import bcrypt from 'bcrypt'
+
+export default class AuthController {
+  static async store (req: Request, res: Response) {
+    const { name, email, password } = req.body
+
+    if (!name) return res.status(400).json({ error: 'O nome é obrigatório' })
+    if (!email) return res.status(400).json({ error: 'O email é obrigatório' })
+    if (!password) return res.status(400).json({ error: 'A senha é obrigatória' })
+
+    const user = new User()
+    user.name = name
+    user.email = email
+    // Gera a hash da senha com bcrypt - para não salvar a senha em texto puro
+    user.password = bcrypt.hashSync(password, 10)
+    await user.save()
+
+    // Não vamos retornar a hash da senha
+    return res.status(201).json({
+      id: user.id,
+      name: user.name,
+      email: user.email
+    })
+  }
+
+  static async login (req: Request, res: Response) {
+    const { email, password } = req.body
+
+    if (!email) return res.status(400).json({ error: 'O email é obrigatório' })
+    if (!password) return res.status(400).json({ error: 'A senha é obrigatória' })
+
+    const user = await User.findOneBy({ email })
+    if (!user) return res.status(401).json({ error: 'Usuário não encontrado' })
+
+    const passwordMatch = bcrypt.compareSync(password, user.password)
+    if (!passwordMatch) return res.status(401).json({ error: 'Senha inválida' })
+
+    // Remove todos os tokens antigos do usuário
+    await Token.delete(
+      { user: { id: user.id } }
+    )
+
+    const token = new Token()
+    // Gera um token aleatório
+    token.token = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20)
+    // Define a data de expiração do token para 1 hora
+    token.expiresAt = new Date(Date.now() + 60 * 60 * 1000)
+    // Gera um refresh token aleatório
+    token.refreshToken = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20)
+
+    token.user = user
+    await token.save()
+
+    return res.json({
+      token: token.token,
+      expiresAt: token.expiresAt,
+      refreshToken: token.refreshToken
+    })
+  }
+
+  static async refresh (req: Request, res: Response) {
+    const { authorization } = req.headers
+
+    if (!authorization) return res.status(400).json({ error: 'O refresh token é obrigatório' })
+
+    const token = await Token.findOneBy({ refreshToken: authorization })
+    if (!token) return res.status(401).json({ error: 'Refresh token inválido' })
+
+    // Verifica se o refresh token ainda é válido
+    if (token.expiresAt < new Date()) {
+      await token.remove()
+      return res.status(401).json({ error: 'Refresh token expirado' })
+    }
+
+    // Atualiza os tokens
+    token.token = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20)
+    token.refreshToken = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20)
+    token.expiresAt = new Date(Date.now() + 60 * 60 * 1000)
+    await token.save()
+
+    return res.json({
+      token: token.token,
+      expiresAt: token.expiresAt,
+      refreshToken: token.refreshToken
+    })
+  }
+
+  static async logout (req: Request, res: Response) {
+    const { authorization } = req.headers
+    
+    if (!authorization) return res.status(400).json({ error: 'O token é obrigatório' })
+
+    // Verifica se o token existe
+    const userToken = await Token.findOneBy({ token: authorization })
+    if (!userToken) return res.status(401).json({ error: 'Token inválido' })
+
+    // Remove o token
+    await userToken.remove()
+
+    // Retorna uma resposta vazia
+    return res.status(204).json()
+  }
+}
+```
+
+Vamos criar as rotas para as funções de autenticação - auth.routes.ts
+```typescript
+import { Router } from 'express'
+import AuthController from '../../controllers/auth/auth.controller'
+
+const authRoutes = Router()
+
+authRoutes.post('/register', AuthController.store)
+authRoutes.post('/login', AuthController.login)
+authRoutes.post('/refresh', AuthController.refresh)
+authRoutes.post('/logout', AuthController.logout)
+
+export default authRoutes
+```
+
+Com as rotas de autenticação criadas vamos ajustar o arquivo src/routes/index.ts
+```typescript
+import authRoutes from './auth/auth.routes'
+routes.use('/auth', authRoutes)
+```
+
+Agora vamos criar um middleware para validar o token - middlewares/auth.middleware.ts
+```typescript
+import { Request, Response, NextFunction } from 'express'
+import Token from '../models/token.entity'
+
+export default async function authMiddleware (req: Request, res: Response, next: NextFunction) {
+  const { authorization } = req.headers
+
+  if (!authorization) return res.status(401).json({ error: 'Token não informado' })
+
+  // Verifica se o token existe
+  const userToken = await Token.findOneBy({ token: authorization })
+  if (!userToken) return res.status(401).json({ error: 'Token inválido' })
+
+  // Verifica se o token expirou
+  if (userToken.expiresAt < new Date()) {
+    await userToken.remove()
+    return res.status(401).json({ error: 'Token expirado' })
+  }
+
+  // Adiciona o id do usuário no header da requisição
+  req.headers.userId = userToken.userId.toString()
+
+  // Continua a execução
+  next()
+}
+```
+
+Agora vamos proteger as rotas que precisam de autenticação - src/routes/task/task.routes.ts
+```typescript
+import authMiddleware from '../../middlewares/auth.middleware'
+taskRoutes.get('/', authMiddleware, TaskController.index)
+taskRoutes.get('/:id', authMiddleware, TaskController.show)
+taskRoutes.post('/', authMiddleware, TaskController.store)
+taskRoutes.put('/:id', authMiddleware, TaskController.update)
+taskRoutes.delete('/:id', authMiddleware, TaskController.delete)
+```
+
+Se uma rota for chamada sem o Token no header da requisição o usuário vai receber um erro devido a checagem do Middleware
