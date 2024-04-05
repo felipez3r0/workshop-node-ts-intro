@@ -18,6 +18,7 @@ Para visualizar o projeto navegue pelas branchs que representam cada etapa do de
 - [Etapa 9 - CORS](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa9-cors)
 - [Etapa 10 - Autenticação](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa10-auth)
 - [Etapa 11 - Tarefas por usuário](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa11-user-tasks)
+- [Etapa 12 - Ajusta email para ser único](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa12-email-unico)
 
 ## Passo a passo
 
@@ -769,4 +770,36 @@ Vamos adicionar o ID do usuário na remoção de uma task - src/controllers/task
     await task.remove()
     return res.status(204).json()
   }
+```
+
+### Etapa 12 - Ajusta email para ser único
+
+O campo email da entity User não está configurado como um campo único, isso vai permitir dois cadastros com o mesmo e-mail e pode bagunçar os acessos as tarefas.
+
+Para corrigir o problema podemos ajustar a entity adicionando a informação de campo único e também fazer a verificação no controller
+
+Entidade - user.entity.ts
+```typescript
+import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, OneToMany, Unique } from 'typeorm'
+import Token from './token.entity'
+import Task from './task.entity'
+
+@Entity()
+@Unique(["email"])
+export default class User extends BaseEntity {
+```
+
+Controller - auth.controller.ts
+```typescript
+export default class AuthController {
+  static async store (req: Request, res: Response) {
+    const { name, email, password } = req.body
+
+    if (!name) return res.status(400).json({ error: 'O nome é obrigatório' })
+    if (!email) return res.status(400).json({ error: 'O email é obrigatório' })
+    if (!password) return res.status(400).json({ error: 'A senha é obrigatória' })
+
+    // Verifica se o email já está cadastrado
+    const userCheck = await User.findOneBy({ email })
+    if (userCheck) return res.status(400).json({ error: 'Email já cadastrado' })
 ```

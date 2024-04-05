@@ -1,8 +1,9 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm'
+import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, OneToMany, Unique } from 'typeorm'
 import Token from './token.entity'
 import Task from './task.entity'
 
 @Entity()
+@Unique(["email"])
 export default class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number
