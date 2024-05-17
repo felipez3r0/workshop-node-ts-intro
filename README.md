@@ -654,7 +654,7 @@ Se uma rota for chamada sem o Token no header da requisição o usuário vai rec
 
 Vamos adicionar a relação entre as entidades no arquivo task.entity.ts
 ```typescript
-@Column({name: 'user_id'})
+@Column()
 userId!: number
 
 @ManyToOne(() => User, user => user.tasks)
