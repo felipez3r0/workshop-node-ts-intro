@@ -19,6 +19,7 @@ Para visualizar o projeto navegue pelas branchs que representam cada etapa do de
 - [Etapa 10 - Autenticação](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa10-auth)
 - [Etapa 11 - Tarefas por usuário](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa11-user-tasks)
 - [Etapa 12 - Ajusta email para ser único](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa12-email-unico)
+- [Etapa 13 - Aprimorando a segurança com HTTP Only Cookies](https://github.com/felipez3r0/workshop-node-ts-intro/tree/etapa13-aprimorando-seguranca)
 
 ## Passo a passo
 
@@ -803,3 +804,139 @@ export default class AuthController {
     const userCheck = await User.findOneBy({ email })
     if (userCheck) return res.status(400).json({ error: 'Email já cadastrado' })
 ```
+
+### Etapa 13 - Aprimorando a segurança com HTTP Only Cookies
+
+Vamos adicionar o cookie-parser para trabalhar com cookies
+```shell
+yarn add cookie-parser @types/cookie-parser
+```
+
+Vamos adicionar o cookie-parser ao projeto - src/server.ts
+```typescript
+import cookieParser from 'cookie-parser'
+
+app.use(cookieParser())
+```
+
+Vamos ajustar o controller de autenticação para retornar o token em um cookie - src/controllers/auth/auth.controller.ts
+```typescript
+  static async login (req: Request, res: Response) {
+    const { email, password } = req.body
+
+    if (!email) return res.status(400).json({ error: 'O email é obrigatório' })
+    if (!password) return res.status(400).json({ error: 'A senha é obrigatória' })
+
+    const user = await User.findOneBy({ email })
+    if (!user) return res.status(401).json({ error: 'Usuário não encontrado' })
+
+    const passwordMatch = bcrypt.compareSync(password, user.password)
+    if (!passwordMatch) return res.status(401).json({ error: 'Senha inválida' })
+
+    // Remove todos os tokens antigos do usuário
+    await Token.delete(
+      { user: { id: user.id } }
+    )
+
+    const token = new Token()
+    // Gera um token aleatório
+    token.token = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20)
+    // Define a data de expiração do token para 1 hora
+    token.expiresAt = new Date(Date.now() + 60 * 60 * 1000)
+    // Gera um refresh token aleatório
+    token.refreshToken = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20)
+
+    token.user = user
+    await token.save()
+
+    // Adiciona o token em um cookie
+    res.cookie('token', token.token, { httpOnly: true, secure: true, sameSite: 'none' }) // Aqui estamos definindo o cookie como HTTP Only, Secure e SameSite None
+    return res.json({
+      token: token.token,
+      expiresAt: token.expiresAt,
+      refreshToken: token.refreshToken
+    })
+  }
+```
+
+Vamos ajustar o controller de autenticação para retornar o refresh token em um cookie - src/controllers/auth/auth.controller.ts
+```typescript
+  static async refresh (req: Request, res: Response) {
+    const { authorization } = req.cookies
+
+    if (!authorization) return res.status(400).json({ error: 'O refresh token é obrigatório' })
+
+    const token = await Token.findOneBy({ refreshToken: authorization })
+    if (!token) return res.status(401).json({ error: 'Refresh token inválido' })
+
+    // Verifica se o refresh token ainda é válido
+    if (token.expiresAt < new Date()) {
+      await token.remove()
+      return res.status(401).json({ error: 'Refresh token expirado' })
+    }
+
+    // Atualiza os tokens
+    token.token = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20)
+    token.refreshToken = bcrypt.hashSync(Math.random().toString(36), 1).slice(-20)
+    token.expiresAt = new Date(Date.now() + 60 * 60 * 1000)
+    await token.save()
+
+    // Adiciona o token em um cookie
+    res.cookie('token', token.token, { httpOnly: true, secure: true, sameSite: 'none' }) // Aqui estamos definindo o cookie como HTTP Only, Secure e SameSite None
+    return res.json({
+      token: token.token,
+      expiresAt: token.expiresAt,
+      refreshToken: token.refreshToken
+    })
+  }
+```
+
+Vamos ajustar o controller de autenticação para remover o token do cookie - src/controllers/auth/auth.controller.ts
+```typescript
+  static async logout (req: Request, res: Response) {
+    const { authorization } = req.cookies
+    
+    if (!authorization) return res.status(400).json({ error: 'O token é obrigatório' })
+
+    // Verifica se o token existe
+    const userToken = await Token.findOneBy({ token: authorization })
+    if (!userToken) return res.status(401).json({ error: 'Token inválido' })
+
+    // Remove o token
+    await userToken.remove()
+
+    // Remove o token do cookie
+    res.clearCookie('token')
+
+    // Retorna uma resposta vazia
+    return res.status(204).json()
+  }
+```
+
+Vamos ajustar o Middleware de autenticação para buscar o token no cookie - src/middlewares/auth.middleware.ts
+```typescript
+export default async function authMiddleware (req: Request, res: Response, next: NextFunction) {
+  const { token } = req.cookies // Busca o token no cookie usando o req.cookies
+
+  if (!token) return res.status(401).json({ error: 'Token não informado' })
+
+  // Verifica se o token existe
+  const userToken = await Token.findOneBy({ token })
+  if (!userToken) return res.status(401).json({ error: 'Token inválido' })
+
+  // Verifica se o token expirou
+  if (userToken.expiresAt < new Date()) {
+    await userToken.remove()
+    return res.status(401).json({ error: 'Token expirado' })
+  }
+
+  // Adiciona o id do usuário no header da requisição
+  req.headers.userId = userToken.userId.toString()
+
+  // Continua a execução
+  next()
+}
+```
+
+Agora podemos testar a aplicação e verificar que o token está sendo salvo no cookie, o mesmo pode ser verificado no DevTools do navegador.
+Dessa forma quando uma requisição for feita para a API o token vai ser enviado automaticamente pelo navegador e não precisa ser salvo no LocalStorage ou SessionStorage.

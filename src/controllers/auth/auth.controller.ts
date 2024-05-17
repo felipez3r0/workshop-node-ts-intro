@@ -58,6 +58,8 @@ export default class AuthController {
     token.user = user
     await token.save()
 
+    // Adiciona o token em um cookie
+    res.cookie('token', token.token, { httpOnly: true, secure: true, sameSite: 'none' }) // Aqui estamos definindo o cookie como HTTP Only, Secure e SameSite None
     return res.json({
       token: token.token,
       expiresAt: token.expiresAt,
@@ -85,6 +87,8 @@ export default class AuthController {
     token.expiresAt = new Date(Date.now() + 60 * 60 * 1000)
     await token.save()
 
+    // Adiciona o token em um cookie
+    res.cookie('token', token.token, { httpOnly: true, secure: true, sameSite: 'none' }) // Aqui estamos definindo o cookie como HTTP Only, Secure e SameSite None
     return res.json({
       token: token.token,
       expiresAt: token.expiresAt,
@@ -103,6 +107,9 @@ export default class AuthController {
 
     // Remove o token
     await userToken.remove()
+
+    // Remove o cookie
+    res.clearCookie('token')
 
     // Retorna uma resposta vazia
     return res.status(204).json()
