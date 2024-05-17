@@ -940,3 +940,13 @@ export default async function authMiddleware (req: Request, res: Response, next:
 
 Agora podemos testar a aplicação e verificar que o token está sendo salvo no cookie, o mesmo pode ser verificado no DevTools do navegador.
 Dessa forma quando uma requisição for feita para a API o token vai ser enviado automaticamente pelo navegador e não precisa ser salvo no LocalStorage ou SessionStorage.
+
+Precisamos ajustar o CORS para permitir o uso de cookies - src/server.ts
+```typescript
+import cors from 'cors'
+
+app.use(cors({
+  origin: ['http://localhost:3000', 'https://meuapp.com'],
+  credentials: true // Habilita o uso de cookies
+}))
+```
