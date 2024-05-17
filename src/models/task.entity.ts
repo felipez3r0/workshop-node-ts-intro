@@ -12,7 +12,7 @@ export default class Task extends BaseEntity {
   @Column({default: false})
   completed!: boolean
 
-  @Column({name: 'user_id'})
+  @Column()
   userId!: number
 
   @ManyToOne(() => User, user => user.tasks)
