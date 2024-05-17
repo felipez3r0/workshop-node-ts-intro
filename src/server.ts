@@ -9,7 +9,12 @@ dotenv.config()
 const app = express()
 const port = process.env.PORT || 3001
 
-app.use(cors()) // habilita o cors
+app.use(cors(
+  {
+    origin: ['http://localhost:3001', 'http://localhost:5173'],
+    credentials: true
+  }
+)) // habilita o cors
 app.use(cookieParser()) // habilita o cookie parser
 app.use(express.json()) // habilita o express para receber dados no formato json
 app.use(routes) // habilita as rotas
