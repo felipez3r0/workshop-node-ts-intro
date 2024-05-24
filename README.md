@@ -882,7 +882,7 @@ Vamos ajustar o controller de autenticação para retornar o refresh token em um
     await token.save()
 
     // Adiciona o token em um cookie
-    res.cookie('token', token.token, { httpOnly: true, secure: true, sameSite: 'none' }) // Aqui estamos definindo o cookie como HTTP Only, Secure e SameSite None
+    res.cookie('token', token.token, { httpOnly: true, secure: true, sameSite: 'Lax' }) // Aqui estamos definindo o cookie como HTTP Only, Secure e SameSite None
     return res.json({
       token: token.token,
       expiresAt: token.expiresAt,
