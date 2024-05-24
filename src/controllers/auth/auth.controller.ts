@@ -59,7 +59,7 @@ export default class AuthController {
     await token.save()
 
     // Adiciona o token em um cookie
-    res.cookie('token', token.token, { httpOnly: true, secure: true, sameSite: 'lax', domain: 'meuapp-dmfz.onrender.com' }) // Aqui estamos definindo o cookie como HTTP Only, Secure e SameSite Lax, vamos ajustar também para o Cookie funcionar no domínio do Render que está nosso front (onde vamos fazer deploy do Backend e Frontend)
+    res.cookie('token', token.token, { httpOnly: true, secure: true, sameSite: 'strict', domain: 'https://meuapp-dmfz.onrender.com' }) // Aqui estamos definindo o cookie como HTTP Only, Secure e SameSite Strict, vamos ajustar também para o Cookie funcionar no domínio do Render que está nosso front (onde vamos fazer deploy do Backend e Frontend)
     return res.json({
       token: token.token,
       expiresAt: token.expiresAt,
@@ -88,7 +88,7 @@ export default class AuthController {
     await token.save()
 
     // Adiciona o token em um cookie
-    res.cookie('token', token.token, { httpOnly: true, secure: true, sameSite: 'lax', domain: 'meuapp-dmfz.onrender.com' }) // Aqui estamos definindo o cookie como HTTP Only, Secure e SameSite Lax, vamos ajustar também para o Cookie funcionar no domínio do Render que está nosso front (onde vamos fazer deploy do Backend e Frontend)
+    res.cookie('token', token.token, { httpOnly: true, secure: true, sameSite: 'strict', domain: 'https://meuapp-dmfz.onrender.com' }) // Aqui estamos definindo o cookie como HTTP Only, Secure e SameSite Strict, vamos ajustar também para o Cookie funcionar no domínio do Render que está nosso front (onde vamos fazer deploy do Backend e Frontend)
     return res.json({
       token: token.token,
       expiresAt: token.expiresAt,
