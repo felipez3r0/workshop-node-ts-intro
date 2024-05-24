@@ -59,7 +59,7 @@ export default class AuthController {
     await token.save()
 
     // Adiciona o token em um cookie
-    res.cookie('token', token.token, { httpOnly: true, secure: true, sameSite: 'Lax' }) // Aqui estamos definindo o cookie como HTTP Only, Secure e SameSite Lax
+    res.cookie('token', token.token, { httpOnly: true, secure: true, sameSite: 'Lax', domain: 'onrender.com' }) // Aqui estamos definindo o cookie como HTTP Only, Secure e SameSite Lax, vamos ajustar também para o Cookie funciona em domínio do Render (onde vamos fazer deploy do Backend e Frontend)
     return res.json({
       token: token.token,
       expiresAt: token.expiresAt,
@@ -88,7 +88,7 @@ export default class AuthController {
     await token.save()
 
     // Adiciona o token em um cookie
-    res.cookie('token', token.token, { httpOnly: true, secure: true, sameSite: 'Lax' }) // Aqui estamos definindo o cookie como HTTP Only, Secure e SameSite Lax
+    res.cookie('token', token.token, { httpOnly: true, secure: true, sameSite: 'Lax', domain: 'onrender.com' }) // Aqui estamos definindo o cookie como HTTP Only, Secure e SameSite Lax, vamos ajustar também para o Cookie funciona em domínio do Render (onde vamos fazer deploy do Backend e Frontend)
     return res.json({
       token: token.token,
       expiresAt: token.expiresAt,
