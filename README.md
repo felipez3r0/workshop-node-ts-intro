@@ -950,3 +950,6 @@ app.use(cors({
   credentials: true // Habilita o uso de cookies
 }))
 ```
+
+Os cookies de terceiros serão bloqueados em breve pelos navegadores (no Firefox isso já ocorre), então ao publicar o projeto você precisa garantir que a API e o cliente usem o mesmo domínio.
+Para isso vale alterar a propriedade sameSite para 'lax' ou 'strict' e adicionar no cookie a propriedade 'domain' apontando para o domínio configurado.
